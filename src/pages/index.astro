@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import PostCard from '../components/PostCard.astro';
+
+const posts = (await getCollection('posts')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+<Layout>
+  <section class="hero">
+    <div class="kicker">Engineering Notes</div>
+    <h1>네트워크를 이해하는 방식을 기록합니다</h1>
+    <p>방화벽·라우팅·스위칭 구축 현장에서 배운 것들을, 처음 배우는 사람도 따라올 수 있게 다시 씁니다.</p>
+  </section>
+
+  <section class="list">
+    {posts.map((post) => <PostCard post={post} />)}
+  </section>
+</Layout>

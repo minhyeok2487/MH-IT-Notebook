@@ -1,0 +1,23 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+const { post } = Astro.props;
+const { title, date, category, subcategory, excerpt } = post.data;
+
+// 목차 2depth: category(대분류) - subcategory(소분류). 그 이상은 없음.
+const tagClass = category.toLowerCase();
+const dateStr = date.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
+---
+<article class="post">
+  <div class="date">{dateStr}</div>
+  <div>
+    <div class="tagrow">
+      <span class={`tag ${tagClass}`}>{category}{subcategory && ` · ${subcategory}`}</span>
+    </div>
+    <h2><a href={`/posts/${post.id}/`}>{title}</a></h2>
+    <p class="excerpt">{excerpt}</p>
+  </div>
+</article>

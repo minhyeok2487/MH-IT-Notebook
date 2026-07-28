@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { slugify } from '../../lib/slug';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { title, date, category, subcategory } = post.data;
+const { Content } = await render(post);
+
+const dateStr = date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+const catHref = `/category/${slugify(category)}/`;
+const subHref = subcategory ? `${catHref}${slugify(subcategory)}/` : undefined;
+---
+<Layout title={title} activeCategory={category} activeSubcategory={subcategory}>
+  <div class="crumb">
+    <a href="/">MH IT Notebook</a> / <a href={catHref}>{category}</a>{subcategory && <> / <a href={subHref}>{subcategory}</a></>}
+  </div>
+
+  <article class="full">
+    <h1>{title}</h1>
+    <div class="meta">
+      <span>{dateStr}</span>
+    </div>
+    <div class="body">
+      <Content />
+    </div>
+  </article>
+</Layout>

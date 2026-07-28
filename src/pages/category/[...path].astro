@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { slugify } from '../../lib/slug';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+
+  const categories = new Map<string, Set<string>>();
+  for (const post of posts) {
+    const { category, subcategory } = post.data;
+    if (!categories.has(category)) categories.set(category, new Set());
+    if (subcategory) categories.get(category)!.add(subcategory);
+  }
+
+  const paths = [];
+  for (const [category, subs] of categories) {
+    paths.push({ params: { path: slugify(category) }, props: { category, subcategory: undefined } });
+    for (const subcategory of subs) {
+      paths.push({
+        params: { path: `${slugify(category)}/${slugify(subcategory)}` },
+        props: { category, subcategory },
+      });
+    }
+  }
+  return paths;
+}
+
+const { category, subcategory } = Astro.props as { category: string; subcategory?: string };
+
+const allPosts = await getCollection('posts');
+const posts = allPosts
+  .filter((p) => p.data.category === category && (!subcategory || p.data.subcategory === subcategory))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const heading = subcategory ? `${category} / ${subcategory}` : category;
+---
+<Layout title={heading} activeCategory={category} activeSubcategory={subcategory}>
+  <section class="hero">
+    <div class="kicker">Category</div>
+    <h1>{heading}</h1>
+    <p>{posts.length}개의 글</p>
+  </section>
+
+  <section class="list">
+    {posts.map((post) => <PostCard post={post} />)}
+  </section>
+</Layout>
