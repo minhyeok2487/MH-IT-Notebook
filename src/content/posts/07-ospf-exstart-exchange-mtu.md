@@ -34,6 +34,4 @@ OSPF가 인접관계를 맺을 때 ExStart 단계에서 마스터·슬레이브�
 
 ACL/방화벽 쪽부터 보면, Hello는 224.0.0.5로 멀티캐스트라서 통과하니까 2-Way까지는 정상적으로 올라갑니다. 그런데 ExStart부터는 DBD가 DR/BDR이 아닌 일반 라우터끼리는 상대 IP로 유니캐스트 전송되는데, 중간에 ACL이나 방화벽이 유니캐스트만 걸러내면 Hello는 살아있는데 DBD만 안 가는 상황이 됩니다. 그래서 "Hello는 되는데 인접이 안 올라간다"는 증상이면 MTU보다 이쪽을 먼저 의심하기도 합니다. 확인은 상대 IP로 직접 유니캐스트가 오가는지 캡처해보면 됩니다. 
 
-Router-ID 중복은, 두 라우터가 같은 Router-ID(보통 루프백을 안 잡고 자동 선출될 때 실수로 겹치는 경우)를 쓰면 ExStart에서 마스터·슬레이브 협상 자체가 꼬여서 상태가 계속 리셋되거나 ExStart를 맴돌 수 있다는 겁니다. show ip ospf neighbor에서 Router-ID가 겹치는지, 로그에 Router-ID conflict 메시지가 있는지로 확인합니다. 
-
-부차적으로는 duplex 미스매치로 인한 패킷 손상, CPU 과부하나 CoPP로 인한 드롭도 언급할 수 있지만, 면접 답변으로는 위 두 개가 핵심입니다.
+Router-ID 중복은, 두 라우터가 같은 Router-ID(보통 루프백을 안 잡고 자동 선출될 때 실수로 겹치는 경우)를 쓰면 ExStart에서 마스터·슬레이브 협상 자체가 꼬여서 상태가 계속 리셋되거나 ExStart를 맴돌 수 있다는 겁니다. show ip ospf neighbor에서 Router-ID가 겹치는지, 로그에 Router-ID conflict 메시지가 있는지로 확인합니다.
